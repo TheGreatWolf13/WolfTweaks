@@ -1,0 +1,6 @@
+@FieldsAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+package tgw.wolf_tweaks;
+
+import net.minecraft.FieldsAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;

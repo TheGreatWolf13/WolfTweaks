@@ -1,0 +1,9 @@
+{
+  "wolf_tweaks.notify_durability": "%1$s está abaixo de %2$s de durabilidade",
+  "wolf_tweaks.mining_time.instant_mine": "Tempo de Mineração: Instantâneo",
+  "wolf_tweaks.mining_time.time": "Tempo de Mineração: %1$ss",
+  "wolf_tweaks.key.replace": "Substituir Bloco",
+  "wolf_tweaks.gui.option.rgb": "Enviar informação RGB",
+  "wolf_tweaks.key.random_block_placement_toggle": "Alternar Colocamento Aleatório de Blocos",
+  "wolf_tweaks.gui.random_block_placement": "Aleatório"
+}

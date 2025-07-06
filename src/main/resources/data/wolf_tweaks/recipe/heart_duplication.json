@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "cateogry": "misc",
+  "group": "sherd_duplication",
+  "ingredients": [
+    [
+      "minecraft:brick"
+    ],
+    [
+      "minecraft:heart_pottery_sherd"
+    ]
+  ],
+  "result": {
+    "id": "minecraft:heart_pottery_sherd",
+    "count": 2
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "tgw.wolf_tweaks.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "MixinAbstractMinecart",
+    "MixinAnvilMenu",
+    "MixinAxeItem",
+    "MixinBlock",
+    "MixinBlockItem",
+    "MixinConnection",
+    "MixinCreeper",
+    "MixinDispenserBlock",
+    "MixinFoodData",
+    "MixinHoeItem",
+    "MixinInventory",
+    "MixinItemEntity",
+    "MixinItemStack",
+    "MixinLeavesBlock",
+    "MixinMusics",
+    "MixinObserverBlock",
+    "MixinPatrollingMonster",
+    "MixinPhantomSpawner",
+    "MixinPistonBaseBlock",
+    "MixinScaffoldingBlock",
+    "MixinShovelItem",
+    "MixinSmithingMenu",
+    "MixinThrownTrident",
+    "MixinVaultServerData",
+    "MixinVaultSharedData",
+    "MixinVillager"
+  ],
+  "client": [
+    "MixinContainerEventHandler",
+    "MixinControlsScreen",
+    "MixinHorseInventoryScreen",
+    "MixinInventoryScreen",
+    "MixinMinecraft",
+    "MixinOptions",
+    "MixinScreen"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
