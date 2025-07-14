@@ -3,8 +3,6 @@ package tgw.wolf_tweaks;
 import com.google.gson.Gson;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceIntPair;
@@ -49,6 +47,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 import tgw.wolf_tweaks.patches.PatchOptions;
 import tgw.wolf_tweaks.util.collection.lists.OArrayList;
@@ -58,7 +57,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
@@ -75,7 +74,7 @@ public final class WolfTweaksClient implements ClientModInitializer {
     private static boolean randomPlacementMode;
     private static int tickCount;
 
-    public static void appendMiningSpeed(Block block, List<Component> list) {
+    public static void appendMiningSpeed(Block block, Consumer<Component> consumer) {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
         if (level == null) {
@@ -90,7 +89,7 @@ public final class WolfTweaksClient implements ClientModInitializer {
         }
         float hardness = block.defaultDestroyTime();
         if (hardness == 0) {
-            list.add(INSTANT_MINE);
+            consumer.accept(INSTANT_MINE);
         }
         else {
             ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
@@ -106,12 +105,12 @@ public final class WolfTweaksClient implements ClientModInitializer {
                 damage /= 100;
             }
             if (damage > 1) {
-                list.add(INSTANT_MINE);
+                consumer.accept(INSTANT_MINE);
             }
             else {
                 int ticks = Mth.ceil(1 / damage);
                 double seconds = ticks / 20.0;
-                list.add(Component.translatable("wolf_tweaks.mining_time.time", String.format("%.2f", seconds)).withStyle(ChatFormatting.BLUE));
+                consumer.accept(Component.translatable("wolf_tweaks.mining_time.time", String.format("%.2f", seconds)).withStyle(ChatFormatting.BLUE));
             }
         }
     }
@@ -137,7 +136,7 @@ public final class WolfTweaksClient implements ClientModInitializer {
         while ((validSlots >> randomSlot & 1) == 0) {
             randomSlot = random.nextInt(9);
         }
-        player.getInventory().selected = randomSlot;
+        player.getInventory().setSelectedSlot(randomSlot);
     }
 
     public static void recordPacket(Packet<?> packet) {
@@ -152,14 +151,11 @@ public final class WolfTweaksClient implements ClientModInitializer {
         mc.getTextureManager().getTexture(RANDOM_PLACEMENT_TEXTURE);
         int x = screenWidth / 2;
         int y = screenHeight / 2 - 4;
-        PoseStack matrixStack = gui.pose();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        matrixStack.pushPose();
-        matrixStack.translate(0, -15, 0);
+        Matrix3x2fStack matrixStack = gui.pose();
+        matrixStack.pushMatrix();
+        matrixStack.translate(0, -15);
         gui.drawCenteredString(mc.font, Component.translatable("wolf_tweaks.gui.random_block_placement"), x, y, 0xFFFF_FFFF);
-        matrixStack.popPose();
-        RenderSystem.disableBlend();
+        matrixStack.popMatrix();
     }
 
     private static void sendChromaState(Minecraft mc) {

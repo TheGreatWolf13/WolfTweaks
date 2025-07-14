@@ -1,25 +1,22 @@
 package tgw.wolf_tweaks.mixin;
 
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.DiggerItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ShovelItem;
-import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ShovelItem.class)
-public abstract class MixinShovelItem extends DiggerItem {
+public abstract class MixinShovelItem extends Item {
 
-    public MixinShovelItem(ToolMaterial toolMaterial, TagKey<Block> tagKey, float f, float g, Properties properties) {
-        super(toolMaterial, tagKey, f, g, properties);
+    public MixinShovelItem(Properties properties) {
+        super(properties);
     }
 
     @SuppressWarnings("MethodMayBeStatic")

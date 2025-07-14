@@ -104,15 +104,15 @@ public class GSIState {
             EFFECT_NAMES[25] = "dolphinsGrace";
             EFFECT_NAMES[26] = "bad_omen";
             EFFECT_NAMES[27] = "villageHero";
-            EFFECTS[0] = MobEffects.MOVEMENT_SPEED;
-            EFFECTS[1] = MobEffects.MOVEMENT_SLOWDOWN;
-            EFFECTS[2] = MobEffects.DIG_SPEED;
-            EFFECTS[3] = MobEffects.DIG_SLOWDOWN;
-            EFFECTS[4] = MobEffects.DAMAGE_BOOST;
-            EFFECTS[5] = MobEffects.JUMP;
-            EFFECTS[6] = MobEffects.CONFUSION;
+            EFFECTS[0] = MobEffects.SPEED;
+            EFFECTS[1] = MobEffects.SLOWNESS;
+            EFFECTS[2] = MobEffects.HASTE;
+            EFFECTS[3] = MobEffects.MINING_FATIGUE;
+            EFFECTS[4] = MobEffects.STRENGTH;
+            EFFECTS[5] = MobEffects.JUMP_BOOST;
+            EFFECTS[6] = MobEffects.NAUSEA;
             EFFECTS[7] = MobEffects.REGENERATION;
-            EFFECTS[8] = MobEffects.DAMAGE_RESISTANCE;
+            EFFECTS[8] = MobEffects.RESISTANCE;
             EFFECTS[9] = MobEffects.FIRE_RESISTANCE;
             EFFECTS[10] = MobEffects.WATER_BREATHING;
             EFFECTS[11] = MobEffects.INVISIBILITY;
@@ -198,7 +198,7 @@ public class GSIState {
 
             }
             this.worldTime = level.getDayTime();
-            this.isDayTime = level.isDay();
+            this.isDayTime = level.isBrightOutside();
             this.rainStrength = level.getRainLevel(1);
             this.isRaining = level.isRaining();
             ResourceKey<Level> dimension = level.dimension();

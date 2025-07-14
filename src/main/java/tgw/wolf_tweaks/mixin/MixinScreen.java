@@ -16,13 +16,13 @@ public abstract class MixinScreen extends AbstractContainerEventHandler implemen
 
     @Shadow protected @Nullable Minecraft minecraft;
 
-    @Redirect(method = "renderBackground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderBlurredBackground()V"))
-    public void onRenderBackground(Screen instance) {
+    @Redirect(method = "renderBackground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderBlurredBackground(Lnet/minecraft/client/gui/GuiGraphics;)V"))
+    public void onRenderBackground_renderBlurredBackground(Screen instance, GuiGraphics guiGraphics) {
         //Do nothing
     }
 
     @Redirect(method = "renderBackground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderMenuBackground(Lnet/minecraft/client/gui/GuiGraphics;)V"))
-    public void onRenderBackground(Screen instance, GuiGraphics guiGraphics) {
+    public void onRenderBackground_renderMenuBackground(Screen instance, GuiGraphics guiGraphics) {
         //noinspection VariableNotUsedInsideIf,DataFlowIssue
         if (this.minecraft.level != null) {
             this.renderTransparentBackground(guiGraphics);

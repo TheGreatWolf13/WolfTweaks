@@ -1,10 +1,8 @@
 package tgw.wolf_tweaks.mixin;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.HoeItem;
-import net.minecraft.world.item.ToolMaterial;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -20,12 +18,12 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 @Mixin(HoeItem.class)
-public abstract class MixinHoeItem extends DiggerItem {
+public abstract class MixinHoeItem extends Item {
 
     @Shadow @Final protected static Map<Block, Pair<Predicate<UseOnContext>, Consumer<UseOnContext>>> TILLABLES;
 
-    public MixinHoeItem(ToolMaterial toolMaterial, TagKey<Block> tagKey, float f, float g, Properties properties) {
-        super(toolMaterial, tagKey, f, g, properties);
+    public MixinHoeItem(Properties properties) {
+        super(properties);
     }
 
     @Inject(method = "<clinit>", at = @At("TAIL"))

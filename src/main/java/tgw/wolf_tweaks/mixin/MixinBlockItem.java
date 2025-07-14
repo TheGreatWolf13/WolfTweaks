@@ -7,27 +7,28 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.block.Block;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.Shadow;
 import tgw.wolf_tweaks.WolfTweaksClient;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 @Mixin(BlockItem.class)
 public abstract class MixinBlockItem extends Item {
+
+    @SuppressWarnings("DeprecatedIsStillUsed") @Shadow @Final @Deprecated private Block block;
 
     public MixinBlockItem(Properties properties) {
         super(properties);
     }
 
-    @SuppressWarnings("MethodMayBeStatic")
-    @Redirect(method = "appendHoverText", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;appendHoverText(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/Item$TooltipContext;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V"))
-    private void appendHoverText_appendHoverText(Block block, ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flags) {
-        block.appendHoverText(stack, context, list, flags);
+    @Override
+    public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, TooltipDisplay tooltipDisplay, Consumer<Component> consumer, TooltipFlag tooltipFlag) {
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-            WolfTweaksClient.appendMiningSpeed(block, list);
+            WolfTweaksClient.appendMiningSpeed(this.block, consumer);
         }
     }
 }

@@ -124,7 +124,7 @@ public class ChunkLoaderManager {
 
     private void updateChunkLoaders(ServerLevel level) {
         LSet currentChunks = this.calculateLoadedChunks(level);
-        final LongSet forcedChunks = level.getForcedChunks();
+        final LongSet forcedChunks = level.getForceLoadedChunks();
         forcedChunks.forEach(pos -> {
             if (!currentChunks.contains(pos)) {
                 // Unload chunk
