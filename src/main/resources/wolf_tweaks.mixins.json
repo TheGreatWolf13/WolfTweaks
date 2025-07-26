@@ -15,6 +15,7 @@
     "MixinFoodData",
     "MixinHoeItem",
     "MixinInventory",
+    "MixinItem",
     "MixinItemEntity",
     "MixinItemStack",
     "MixinLeavesBlock",

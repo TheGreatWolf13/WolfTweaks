@@ -76,6 +76,8 @@ import tgw.wolf_tweaks.minecart.ChunkLoaderManager;
  * <br>
  * 1.17.1<br>
  * - Reduced vault cooldown to 15min.
+ * <br>
+ * - Fire Aspect Swords can now light campfires, candles and ignite TNT;<br>
  **/
 public class WolfTweaks implements ModInitializer {
 
