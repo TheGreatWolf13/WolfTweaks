@@ -13,15 +13,30 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tgw.wolf_tweaks.minecart.ChunkLoaderManager;
+import tgw.wolf_tweaks.util.CrackedBlocks;
+import tgw.wolf_tweaks.util.MossyBlocks;
+import tgw.wolf_tweaks.util.Util;
+
+import java.util.List;
 
 /**
  * <p>Features:</p>
@@ -78,6 +93,9 @@ import tgw.wolf_tweaks.minecart.ChunkLoaderManager;
  * - Reduced vault cooldown to 15min.
  * <br>
  * - Fire Aspect Swords can now light campfires, candles and ignite TNT;<br>
+ * <br>
+ * - Some blocks can get cracked / mossy with time;<br>
+ * - Campfires burn out after some time;<br>
  **/
 public class WolfTweaks implements ModInitializer {
 
@@ -88,6 +106,8 @@ public class WolfTweaks implements ModInitializer {
     private static final Object2ObjectMap<Level, Long2LongMap> SCAFFOLDING_DEPENDENCY = new Object2ObjectOpenHashMap<>();
     private static final Object2ObjectMap<Level, Long2IntMap> SCAFFOLDING_REF_COUNT = new Object2ObjectOpenHashMap<>();
     private static final Object2LongMap<Level> SCAFFOLDING_TIME = new Object2LongOpenHashMap<>();
+    private static final int DECAY_RADIUS = 64;
+    private static final int DECAY_RATE = 3;
     public static boolean isDroppingScaffolding;
     public static boolean preventScaffoldingDoubleTicking;
     public static int scaffoldingDropX;
@@ -174,6 +194,45 @@ public class WolfTweaks implements ModInitializer {
         }
     }
 
+    private static void registerServerEvents() {
+        ServerTickEvents.END_WORLD_TICK.register(level -> {
+            long time = level.getGameTime();
+            if ((time & 511) == 0) {
+                long lastTime = SCAFFOLDING_TIME.getLong(level);
+                if (lastTime == -1) {
+                    return;
+                }
+                if (time - lastTime >= 400) {
+                    getDependency(level).clear();
+                    getRefCount(level).clear();
+                    SCAFFOLDING_TIME.remove(level);
+                }
+            }
+        });
+        ServerTickEvents.END_WORLD_TICK.register(level -> {
+            List<ServerPlayer> players = level.players();
+            if (players.isEmpty()) {
+                return;
+            }
+            RandomSource random = level.random;
+            for (int i = DECAY_RATE; i > 0; --i) {
+                ServerPlayer player = players.size() == 1 ? players.getFirst() : players.get(random.nextInt(players.size()));
+                int offX = random.nextIntBetweenInclusive(-DECAY_RADIUS, DECAY_RADIUS);
+                int yDown = Math.max(level.getMinY(), player.getBlockY() - DECAY_RADIUS);
+                int yUp = Math.min(level.getMaxY(), player.getBlockY() + DECAY_RADIUS);
+                int y = random.nextIntBetweenInclusive(yDown, yUp);
+                int offZ = random.nextIntBetweenInclusive(-DECAY_RADIUS, DECAY_RADIUS);
+                BlockPos randomPos = player.blockPosition().offset(offX, 0, offZ).atY(y);
+                if (!level.hasChunkAt(randomPos)) {
+                    continue;
+                }
+                //Decay
+                BlockState state = level.getBlockState(randomPos);
+                tryToDecay(level, state, randomPos);
+            }
+        });
+    }
+
     public static void removeDependencies(Level level, BlockPos pos) {
         long toDrop = pos.asLong();
         Long2IntMap scaffoldingRefCount = getRefCount(level);
@@ -206,24 +265,145 @@ public class WolfTweaks implements ModInitializer {
 //        }
     }
 
+    private static void tryToDecay(ServerLevel level, BlockState state, BlockPos pos) {
+        RandomSource random = level.random;
+        Block block = state.getBlock();
+        if (block == Blocks.CAMPFIRE || block == Blocks.SOUL_CAMPFIRE) {
+            if (random.nextFloat() < 0.2f) {
+                level.setBlockAndUpdate(pos, state.setValue(BlockStateProperties.LIT, false));
+            }
+            return;
+        }
+        CrackedBlocks crackedBlocks = CrackedBlocks.anyMatch(block);
+        if (crackedBlocks != null) {
+            if (random.nextFloat() < 0.02f) {
+                boolean exposed = false;
+                for (Direction dir : Util.DIRECTIONS) {
+                    BlockPos relativePos = pos.relative(dir);
+                    if (!level.getBlockState(relativePos).isFaceSturdy(level, relativePos, dir.getOpposite())) {
+                        exposed = true;
+                        break;
+                    }
+                }
+                if (exposed) {
+                    int count = 0;
+                    int x = pos.getX();
+                    int y = pos.getY();
+                    int z = pos.getZ();
+                    BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+                    float chance = 1.0f;
+                    search:
+                    for (int dx = -4; dx <= 4; ++dx) {
+                        mutablePos.setX(x + dx);
+                        for (int dy = -4; dy <= 4; ++dy) {
+                            mutablePos.setY(y + dy);
+                            for (int dz = -4; dz <= 4; ++dz) {
+                                mutablePos.setZ(z + dz);
+                                if (level.getBlockState(mutablePos).getBlock() == crackedBlocks.cracked) {
+                                    chance *= 0.5f;
+                                    if (++count == 10) {
+                                        chance = 0;
+                                        break search;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (random.nextFloat() < chance) {
+                        level.setBlockAndUpdate(pos, crackedBlocks.cracked.withPropertiesOf(state));
+                        return;
+                    }
+                }
+            }
+        }
+        MossyBlocks mossyBlocks = MossyBlocks.anyMatch(block);
+        if (mossyBlocks != null) {
+            if (random.nextFloat() < 0.1f) {
+                Biome biome = level.getBiome(pos).value();
+                if (biome.getBaseTemperature() >= 0.15f) {
+                    boolean exposed = false;
+                    for (Direction dir : Util.DIRECTIONS) {
+                        BlockPos relativePos = pos.relative(dir);
+                        if (!level.getBlockState(relativePos).isFaceSturdy(level, relativePos, dir.getOpposite())) {
+                            exposed = true;
+                            break;
+                        }
+                    }
+                    if (exposed) {
+                        int mossCount = 0;
+                        int x = pos.getX();
+                        int y = pos.getY();
+                        int z = pos.getZ();
+                        BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+                        float chanceByNeighbours = 1.0f;
+                        float chanceByWater = biome.climateSettings.downfall() * 0.1f;
+                        search:
+                        for (int dx = -4; dx <= 4; ++dx) {
+                            mutablePos.setX(x + dx);
+                            for (int dy = -4; dy <= 4; ++dy) {
+                                mutablePos.setY(y + dy);
+                                for (int dz = -4; dz <= 4; ++dz) {
+                                    mutablePos.setZ(z + dz);
+                                    if (MossyBlocks.isMoss(level.getBlockState(mutablePos).getBlock())) {
+                                        chanceByNeighbours *= 0.5f;
+                                        if (++mossCount == 10) {
+                                            chanceByNeighbours = 0;
+                                            break search;
+                                        }
+                                    }
+                                    if (chanceByWater < 1 && level.getFluidState(mutablePos).is(FluidTags.WATER)) {
+                                        chanceByWater += 0.1f;
+                                    }
+                                }
+                            }
+                        }
+                        if (random.nextFloat() < chanceByNeighbours * chanceByWater) {
+                            level.setBlockAndUpdate(pos, mossyBlocks.mossyBlock.withPropertiesOf(state));
+//                            return;
+                        }
+                    }
+                }
+            }
+        }
+//        if (block == Blocks.COBBLESTONE) {
+//            if (random.nextFloat() < 0.02f) {
+//                if (!FallingBlock.isFree(level.getBlockState(pos.below())) && level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, pos) == pos.getY() + 1) {
+//                    int count = 0;
+//                    int x = pos.getX();
+//                    int y = pos.getY();
+//                    int z = pos.getZ();
+//                    BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+//                    float chance = 1.0f;
+//                    search:
+//                    for (int dx = -4; dx <= 4; ++dx) {
+//                        mutablePos.setX(x + dx);
+//                        for (int dy = -4; dy <= 4; ++dy) {
+//                            mutablePos.setY(y + dy);
+//                            for (int dz = -4; dz <= 4; ++dz) {
+//                                mutablePos.setZ(z + dz);
+//                                if (level.getBlockState(mutablePos).getBlock() == Blocks.GRAVEL) {
+//                                    chance *= 0.5f;
+//                                    if (++count == 10) {
+//                                        chance = 0;
+//                                        break search;
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                    if (random.nextFloat() < chance) {
+//                        level.setBlockAndUpdate(pos, Blocks.GRAVEL.defaultBlockState());
+//                    }
+//                }
+//            }
+//        }
+    }
+
     @Override
     public void onInitialize() {
         ServerLifecycleEvents.SERVER_STARTED.register(CHUNK_LOADER_MANAGER::initialize);
         SCAFFOLDING_TIME.defaultReturnValue(-1);
-        ServerTickEvents.END_WORLD_TICK.register(level -> {
-            long time = level.getGameTime();
-            if ((time & 511) == 0) {
-                long lastTime = SCAFFOLDING_TIME.getLong(level);
-                if (lastTime == -1) {
-                    return;
-                }
-                if (time - lastTime >= 400) {
-                    getDependency(level).clear();
-                    getRefCount(level).clear();
-                    SCAFFOLDING_TIME.remove(level);
-                }
-            }
-        });
+        registerServerEvents();
         LOGGER.info("WolfTweaks initialized");
     }
 }
