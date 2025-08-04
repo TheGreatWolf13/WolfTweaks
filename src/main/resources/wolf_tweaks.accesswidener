@@ -5,3 +5,4 @@ accessible method net/minecraft/world/level/block/entity/vault/VaultServerData <
 accessible method net/minecraft/world/level/block/TntBlock prime (Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z
 accessible field net/minecraft/world/level/biome/Biome climateSettings Lnet/minecraft/world/level/biome/Biome$ClimateSettings;
 accessible class net/minecraft/world/level/biome/Biome$ClimateSettings
+accessible method net/minecraft/world/item/BlockItem getPlacementState (Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;

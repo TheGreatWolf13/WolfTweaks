@@ -37,6 +37,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.saveddata.maps.MapId;
@@ -276,11 +277,17 @@ public final class WolfTweaksClient implements ClientModInitializer {
                             Block block = blockItem.getBlock();
                             BlockHitResult blockHit = (BlockHitResult) hitResult;
                             //noinspection ObjectAllocationInLoop
-                            BlockState state = block.getStateForPlacement(new BlockPlaceContext(player, InteractionHand.MAIN_HAND, stack, blockHit));
+                            BlockState state = blockItem.getPlacementState(new BlockPlaceContext(player, InteractionHand.MAIN_HAND, stack, blockHit));
                             if (state != null) {
                                 if (block instanceof SlabBlock) {
                                     if (blockHit.getDirection() == Direction.UP) {
                                         state = state.setValue(SlabBlock.TYPE, SlabType.TOP);
+                                    }
+                                }
+                                BlockState currentState = level.getBlockState(blockHit.getBlockPos());
+                                for (Property property : currentState.getProperties()) {
+                                    if (state.hasProperty(property)) {
+                                        state = state.setValue(property, currentState.getValue(property));
                                     }
                                 }
                                 BlockState finalState = state;
