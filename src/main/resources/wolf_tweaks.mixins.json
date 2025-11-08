@@ -10,6 +10,7 @@
     "MixinBlock",
     "MixinBlockItem",
     "MixinConnection",
+    "MixinCopperGolem",
     "MixinCreeper",
     "MixinDispenserBlock",
     "MixinFoodData",
@@ -27,6 +28,7 @@
     "MixinShovelItem",
     "MixinSmithingMenu",
     "MixinThrownTrident",
+    "MixinTransportItemsBetweenContainers",
     "MixinVaultServerData",
     "MixinVaultSharedData",
     "MixinVillager"

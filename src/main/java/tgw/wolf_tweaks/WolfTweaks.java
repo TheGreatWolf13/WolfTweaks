@@ -96,6 +96,10 @@ import java.util.List;
  * <br>
  * - Some blocks can get cracked / mossy with time;<br>
  * - Campfires burn out after some time;<br>
+ * <br>
+ * 1.22.0<br>
+ * - Improved copper golems with better memory
+ * <br>
  **/
 public class WolfTweaks implements ModInitializer {
 
