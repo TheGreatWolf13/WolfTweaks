@@ -19,7 +19,6 @@
     "MixinItemEntity",
     "MixinItemStack",
     "MixinLeavesBlock",
-    "MixinMusics",
     "MixinObserverBlock",
     "MixinPatrollingMonster",
     "MixinPhantomSpawner",
