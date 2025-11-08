@@ -50,7 +50,7 @@ public abstract class MixinDispenserBlock extends BaseEntityBlock {
     @SuppressWarnings("MethodMayBeStatic")
     @Inject(at = @At("HEAD"), method = "dispenseFrom", cancellable = true)
     private void dispenseFrom_head(ServerLevel level, BlockState state, BlockPos pos, CallbackInfo info) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return;
         }
         if (!(level.getBlockEntity(pos) instanceof DispenserBlockEntity te)) {

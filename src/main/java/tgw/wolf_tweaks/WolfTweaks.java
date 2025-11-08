@@ -186,12 +186,7 @@ public class WolfTweaks implements ModInitializer {
     public static void nofityDurability(ItemStack stack, Player player) {
         player.displayClientMessage(Component.translatable("wolf_tweaks.notify_durability", stack.getDisplayName(), Component.literal("10%").withStyle(ChatFormatting.RED)).withStyle(ChatFormatting.YELLOW), true);
         Level level = player.level();
-        if (level.isClientSide) {
-            level.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.NOTE_BLOCK_PLING, SoundSource.MASTER, 0.6f, 1.0f);
-        }
-        else {
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.NOTE_BLOCK_PLING, SoundSource.MASTER, 0.6f, 1.0f);
-        }
+        level.playSound(level.isClientSide() ? player : null, player.getX(), player.getY(), player.getZ(), SoundEvents.NOTE_BLOCK_PLING, SoundSource.MASTER, 0.6f, 1.0f);
     }
 
     private static void registerServerEvents() {

@@ -174,8 +174,8 @@ public final class WolfTweaksClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        buildingReplace = KeyBindingHelper.registerKeyBinding(new KeyMapping("wolf_tweaks.key.replace", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.categories.creative"));
-        randomPlaceKey = KeyBindingHelper.registerKeyBinding(new KeyMapping("wolf_tweaks.key.random_block_placement_toggle", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, "key.categories.gameplay"));
+        buildingReplace = KeyBindingHelper.registerKeyBinding(new KeyMapping("wolf_tweaks.key.replace", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, KeyMapping.Category.CREATIVE));
+        randomPlaceKey = KeyBindingHelper.registerKeyBinding(new KeyMapping("wolf_tweaks.key.random_block_placement_toggle", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, KeyMapping.Category.GAMEPLAY));
         ClientSendMessageEvents.COMMAND.register(cmd -> {
             if ("packetinfo".equals(cmd)) {
                 if (PACKETS_BY_TYPE.isEmpty()) {

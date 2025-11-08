@@ -3,6 +3,7 @@ package tgw.wolf_tweaks.mixin;
 import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -19,7 +20,7 @@ public abstract class MixinInventoryScreen extends AbstractRecipeBookScreen<Inve
     }
 
     @Inject(method = "mouseReleased", at = @At(value = "RETURN", ordinal = 0))
-    private void onMouseReleased(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
+    private void onMouseReleased(MouseButtonEvent mouseButtonEvent, CallbackInfoReturnable<Boolean> cir) {
         this.setFocused(null);
     }
 }

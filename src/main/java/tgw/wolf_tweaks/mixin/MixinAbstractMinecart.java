@@ -27,12 +27,9 @@ import tgw.wolf_tweaks.patches.PatchAbstractMinecart;
 @Mixin(AbstractMinecart.class)
 public abstract class MixinAbstractMinecart extends VehicleEntity implements PatchAbstractMinecart {
 
-    @Unique
-    private boolean isChunkLoader;
-    @Unique
-    private ChunkPos lastChunkPos;
-    @Unique
-    private int particleTicker;
+    @Unique private boolean isChunkLoader;
+    @Unique private @Nullable ChunkPos lastChunkPos;
+    @Unique private int particleTicker;
 
     public MixinAbstractMinecart(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -93,7 +90,7 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Pat
 
     @Override
     public void startChunkLoader() {
-        if (this.level().isClientSide) {
+        if (this.level().isClientSide()) {
             return;
         }
         this.isChunkLoader = true;

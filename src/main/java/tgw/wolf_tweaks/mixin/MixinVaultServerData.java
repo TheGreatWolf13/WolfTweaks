@@ -27,8 +27,7 @@ public abstract class MixinVaultServerData implements PatchVaultServerData {
 
     @Shadow static Codec<VaultServerData> CODEC;
     @Shadow @Final private List<ItemStack> itemsToEject;
-    @Unique
-    private final Object2LongLinkedOpenHashMap<UUID> rewardedPlayers_ = new Object2LongLinkedOpenHashMap<>();
+    @Unique private final Object2LongLinkedOpenHashMap<UUID> rewardedPlayers_ = new Object2LongLinkedOpenHashMap<>();
     @Shadow private long stateUpdatingResumesAt;
     @Shadow private int totalEjectionsNeeded;
 

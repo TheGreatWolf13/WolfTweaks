@@ -28,7 +28,7 @@ public abstract class MixinVillager extends AbstractVillager implements Reputati
     @Inject(method = "die", at = @At("HEAD"))
     private void die_head(DamageSource damageSource, CallbackInfo ci) {
         Level level = this.level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             //noinspection DataFlowIssue
             List<ServerPlayer> players = level.getServer().getPlayerList().getPlayers();
             if (!players.isEmpty()) {
