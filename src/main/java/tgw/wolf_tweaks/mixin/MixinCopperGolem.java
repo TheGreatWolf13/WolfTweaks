@@ -6,8 +6,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.ContainerUser;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Shearable;
-import net.minecraft.world.entity.animal.AbstractGolem;
-import net.minecraft.world.entity.animal.coppergolem.CopperGolem;
+import net.minecraft.world.entity.animal.golem.AbstractGolem;
+import net.minecraft.world.entity.animal.golem.CopperGolem;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -15,6 +15,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,7 +31,7 @@ public abstract class MixinCopperGolem extends AbstractGolem implements Containe
 
     @Unique private Item lastCarriedItem = Items.AIR;
 
-    public MixinCopperGolem(EntityType<? extends AbstractGolem> entityType, Level level) {
+    public MixinCopperGolem(EntityType<? extends @NotNull AbstractGolem> entityType, Level level) {
         super(entityType, level);
     }
 
@@ -53,7 +54,7 @@ public abstract class MixinCopperGolem extends AbstractGolem implements Containe
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     private void readAdditionalSaveData_tail(ValueInput in, CallbackInfo ci) {
-        Optional<Holder<Item>> dumbOptional = in.read("last_carried_item", Item.CODEC);
+        Optional<Holder<@NotNull Item>> dumbOptional = in.read("last_carried_item", Item.CODEC);
         if (dumbOptional.isPresent()) {
             this.lastCarriedItem = dumbOptional.get().value();
         }

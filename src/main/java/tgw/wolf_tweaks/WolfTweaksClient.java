@@ -25,7 +25,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -44,13 +44,8 @@ import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
-import tgw.wolf_tweaks.patches.PatchOptions;
 import tgw.wolf_tweaks.util.collection.lists.OArrayList;
 import tgw.wolf_tweaks.util.collection.lists.OList;
 
@@ -68,7 +63,7 @@ public final class WolfTweaksClient implements ClientModInitializer {
     private static final Reference2IntMap<PacketType<?>> PACKETS_BY_TYPE = new Reference2IntOpenHashMap<>();
     private static final Gson GSON = new Gson();
     private static final GSIState GSI_STATE = new GSIState();
-    private static final ResourceLocation RANDOM_PLACEMENT_TEXTURE = ResourceLocation.fromNamespaceAndPath("wolf_tweaks", "textures/gui/random_block_placement.png");
+    private static final Identifier RANDOM_PLACEMENT_TEXTURE = Identifier.fromNamespaceAndPath("wolf_tweaks", "textures/gui/random_block_placement.png");
     private static KeyMapping buildingReplace;
     public static boolean placedBlock;
     private static KeyMapping randomPlaceKey;
@@ -159,18 +154,18 @@ public final class WolfTweaksClient implements ClientModInitializer {
         matrixStack.popMatrix();
     }
 
-    private static void sendChromaState(Minecraft mc) {
-        if (((PatchOptions) mc.options).toggleRGB().get()) {
-            try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
-                HttpPost request = new HttpPost("http://localhost:9088");
-                request.addHeader("Content-Type", "application/json");
-                request.setEntity(new StringEntity(GSON.toJson(GSI_STATE.update(mc))));
-                httpClient.execute(request);
-            }
-            catch (Exception ignore) {
-            }
-        }
-    }
+//    private static void sendChromaState(Minecraft mc) {
+//        if (((PatchOptions) mc.options).toggleRGB().get()) {
+//            try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+//                HttpPost request = new HttpPost("http://localhost:9088");
+//                request.addHeader("Content-Type", "application/json");
+//                request.setEntity(new StringEntity(GSON.toJson(GSI_STATE.update(mc))));
+//                httpClient.execute(request);
+//            }
+//            catch (Exception ignore) {
+//            }
+//        }
+//    }
 
     @Override
     public void onInitializeClient() {
@@ -246,9 +241,9 @@ public final class WolfTweaksClient implements ClientModInitializer {
         });
         ClientTickEvents.END_CLIENT_TICK.register(mc -> {
             ++tickCount;
-            if ((tickCount & 7) == 0) {
-                sendChromaState(mc);
-            }
+//            if ((tickCount & 7) == 0) {
+//                sendChromaState(mc);
+//            }
             ClientLevel level = mc.level;
             if (level == null) {
                 return;

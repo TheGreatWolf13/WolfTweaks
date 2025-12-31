@@ -1,7 +1,7 @@
 package tgw.wolf_tweaks.mixin;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemStack;
-import net.minecraft.advancements.critereon.ItemDurabilityTrigger;
+import net.minecraft.advancements.criterion.ItemDurabilityTrigger;
 import net.minecraft.core.component.DataComponentHolder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,7 +15,7 @@ import tgw.wolf_tweaks.WolfTweaks;
 @Mixin(ItemStack.class)
 public abstract class MixinItemStack implements DataComponentHolder, FabricItemStack {
 
-    @Redirect(method = "applyDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/advancements/critereon/ItemDurabilityTrigger;trigger(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/item/ItemStack;I)V"))
+    @Redirect(method = "applyDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/advancements/criterion/ItemDurabilityTrigger;trigger(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/item/ItemStack;I)V"))
     private void applyDamage_trigger(ItemDurabilityTrigger trigger, ServerPlayer player, ItemStack stack, int damage) {
         trigger.trigger(player, stack, damage);
         if (damage >= 0.9 * this.getMaxDamage()) {

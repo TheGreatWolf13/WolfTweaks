@@ -1,36 +1,33 @@
 package tgw.wolf_tweaks.mixin;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractMountInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.HorseInventoryScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
-import net.minecraft.world.entity.animal.horse.Llama;
+import net.minecraft.world.entity.animal.equine.AbstractChestedHorse;
+import net.minecraft.world.entity.animal.equine.Llama;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.HorseInventoryMenu;
-import org.spongepowered.asm.mixin.Final;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import tgw.wolf_tweaks.util.Converter;
 
 @Mixin(HorseInventoryScreen.class)
-public abstract class MixinHorseInventoryScreen extends AbstractContainerScreen<HorseInventoryMenu> {
+public abstract class MixinHorseInventoryScreen extends AbstractMountInventoryScreen<@NotNull HorseInventoryMenu> {
 
-    @Shadow @Final private AbstractHorse horse;
-
-    public MixinHorseInventoryScreen(HorseInventoryMenu abstractContainerMenu, Inventory inventory, Component component) {
-        super(abstractContainerMenu, inventory, component);
+    public MixinHorseInventoryScreen(@NotNull HorseInventoryMenu abstractMountInventoryMenu, Inventory inventory, Component component, int i, LivingEntity livingEntity) {
+        super(abstractMountInventoryMenu, inventory, component, i, livingEntity);
     }
 
     @Override
-    public void renderLabels(GuiGraphics gui, int mouseX, int mouseY) {
+    public void renderLabels(@NotNull GuiGraphics gui, int mouseX, int mouseY) {
         super.renderLabels(gui, mouseX, mouseY);
-        boolean hasChest = this.horse instanceof AbstractChestedHorse h && h.hasChest();
-        double jumpValue = Math.round(Converter.jumpStrengthToJumpHeight(this.horse.getJumpPower()) * 10) / 10.0;
-        double healthValue = Math.round(this.horse.getMaxHealth() * 10) / 10.0;
-        double speedValue = Math.round(Converter.genericSpeedToBlockPerSec(this.horse.getAttributes().getValue(Attributes.MOVEMENT_SPEED)) * 10) / 10.0;
+        boolean hasChest = this.mount instanceof AbstractChestedHorse h && h.hasChest();
+        double jumpValue = Math.round(Converter.jumpStrengthToJumpHeight(this.mount.getJumpPower()) * 10) / 10.0;
+        double healthValue = Math.round(this.mount.getMaxHealth() * 10) / 10.0;
+        double speedValue = Math.round(Converter.genericSpeedToBlockPerSec(this.mount.getAttributes().getValue(Attributes.MOVEMENT_SPEED)) * 10) / 10.0;
         int jumpColor = 0xff46_4646;
         int speedColor = 0xff46_4646;
         int hearthColor = 0xff46_4646;
@@ -68,7 +65,7 @@ public abstract class MixinHorseInventoryScreen extends AbstractContainerScreen<
             gui.drawString(this.font, "⇮ " + jumpValue, 115, 6, jumpColor, false);
             gui.drawString(this.font, "♥ " + healthValue, 140, 6, hearthColor, false);
         }
-        if (this.horse instanceof Llama llama) {
+        if (this.mount instanceof Llama llama) {
             int strength = 3 * llama.getStrength();
             int strengthColor = 0xff46_4646;
             if (strength > 9) {

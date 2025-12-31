@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import tgw.wolf_tweaks.WolfTweaks;
 import tgw.wolf_tweaks.util.collection.lists.OArrayList;
 import tgw.wolf_tweaks.util.collection.lists.OList;
@@ -23,7 +24,7 @@ import tgw.wolf_tweaks.util.collection.sets.OSet;
 import java.util.UUID;
 
 public class ChunkLoaderManager {
-    public O2OMap<ResourceKey<Level>, L2OMap<OList<UUID>>> forceLoadedChunks = new O2OHashMap<>();
+    public O2OMap<ResourceKey<@NotNull Level>, L2OMap<OList<UUID>>> forceLoadedChunks = new O2OHashMap<>();
     private boolean initialized;
     private long lastTick;
     private final OSet<Entity> pendingRegistrations = new OHashSet<>();
@@ -73,8 +74,8 @@ public class ChunkLoaderManager {
         }
         ChunkPos chunkPos = entity.chunkPosition();
         this.removeChunkLoader(entity);
-        WolfTweaks.LOGGER.info("Adding {} to {}", entity, entity.level().dimension().location());
-        ResourceKey<Level> worldRegistryKey = entity.level().dimension();
+        WolfTweaks.LOGGER.info("Adding {} to {}", entity, entity.level().dimension().identifier());
+        ResourceKey<@NotNull Level> worldRegistryKey = entity.level().dimension();
         L2OMap<OList<UUID>> levelChunks = this.forceLoadedChunks.get(worldRegistryKey);
         OList<UUID> list;
         if (levelChunks == null) {
@@ -95,9 +96,9 @@ public class ChunkLoaderManager {
     }
 
     public void removeChunkLoader(Entity entity) {
-        WolfTweaks.LOGGER.info("Removing {} from {}", entity, entity.level().dimension().location());
+        WolfTweaks.LOGGER.info("Removing {} from {}", entity, entity.level().dimension().identifier());
         UUID uuid = entity.getUUID();
-        ResourceKey<Level> worldRegistryKey = entity.level().dimension();
+        ResourceKey<@NotNull Level> worldRegistryKey = entity.level().dimension();
         L2OMap<OList<UUID>> levelChunks = this.forceLoadedChunks.get(worldRegistryKey);
         WolfTweaks.LOGGER.info("levelChunks {}", levelChunks);
         if (levelChunks == null) {
@@ -141,7 +142,7 @@ public class ChunkLoaderManager {
     }
 
     private void updateWorlds() {
-        O2OMap<ResourceKey<Level>, L2OMap<OList<UUID>>> chunks = this.forceLoadedChunks;
+        O2OMap<ResourceKey<@NotNull Level>, L2OMap<OList<UUID>>> chunks = this.forceLoadedChunks;
         for (long it = chunks.beginIteration(); chunks.hasNextIteration(it); it = chunks.nextEntry(it)) {
             ServerLevel level = this.server.getLevel(chunks.getIterationKey(it));
             if (level != null) {

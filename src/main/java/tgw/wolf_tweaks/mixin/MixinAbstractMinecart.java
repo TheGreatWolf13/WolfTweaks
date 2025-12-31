@@ -6,15 +6,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
-import net.minecraft.world.entity.vehicle.MinecartChest;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.MinecartChest;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -58,7 +59,7 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Pat
     }
 
     @Override
-    public void remove(Entity.RemovalReason reason) {
+    public void remove(@NotNull Entity.RemovalReason reason) {
         if (this.isChunkLoader) {
             this.stopChunkLoader();
         }
@@ -94,7 +95,7 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Pat
             return;
         }
         this.isChunkLoader = true;
-        WolfTweaks.LOGGER.debug("Starting chunk loader in {}", this.level().dimension().location());
+        WolfTweaks.LOGGER.debug("Starting chunk loader in {}", this.level().dimension().identifier());
     }
 
     @Unique
@@ -113,7 +114,7 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Pat
     }
 
     @Override
-    public @Nullable Entity teleport(TeleportTransition teleportTransition) {
+    public @Nullable Entity teleport(@NotNull TeleportTransition teleportTransition) {
         boolean wasChunkLoader = this.isChunkLoader;
         if (wasChunkLoader) {
             this.stopChunkLoader(true);

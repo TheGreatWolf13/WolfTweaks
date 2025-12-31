@@ -74,7 +74,7 @@ import java.util.List;
  * - Added replace block keybind;<br>
  * <br>
  * 1.15.0<br>
- * - Added client command packetinfo to show the amount of packets received by type;<br>
+ * - Added client command 'packetinfo' to show the amount of packets received by type;<br>
  * <p>1.15.1<br>
  * - Using PacketTypes instead of class names because of obfuscation;<br>
  * <br>
