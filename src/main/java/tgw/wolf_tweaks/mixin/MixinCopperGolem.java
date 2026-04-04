@@ -36,9 +36,9 @@ public abstract class MixinCopperGolem extends AbstractGolem implements Containe
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
-    private void addAdditionalSaveData_tail(ValueOutput out, CallbackInfo ci) {
+    private void addAdditionalSaveData_tail(ValueOutput output, CallbackInfo ci) {
         if (this.lastCarriedItem != Items.AIR) {
-            out.store("last_carried_item", Item.CODEC, this.lastCarriedItem.builtInRegistryHolder());
+            output.store("last_carried_item", Item.CODEC, this.lastCarriedItem.builtInRegistryHolder());
         }
     }
 
@@ -48,13 +48,13 @@ public abstract class MixinCopperGolem extends AbstractGolem implements Containe
     }
 
     @Inject(method = "mobInteract", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/behavior/BehaviorUtils;throwItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/Vec3;)V"))
-    private void mobInteract_throwItem(Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
+    private void mobInteract_throwItem(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
         this.lastCarriedItem = Items.AIR;
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
-    private void readAdditionalSaveData_tail(ValueInput in, CallbackInfo ci) {
-        Optional<Holder<@NotNull Item>> dumbOptional = in.read("last_carried_item", Item.CODEC);
+    private void readAdditionalSaveData_tail(ValueInput input, CallbackInfo ci) {
+        Optional<Holder<@NotNull Item>> dumbOptional = input.read("last_carried_item", Item.CODEC);
         if (dumbOptional.isPresent()) {
             this.lastCarriedItem = dumbOptional.get().value();
         }

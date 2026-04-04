@@ -15,7 +15,7 @@ public abstract class MixinSmithingMenu extends ItemCombinerMenu {
     }
 
     @Redirect(method = "onTake", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/SmithingMenu;shrinkStackInSlot(I)V", ordinal = 0))
-    private void onOnTake(SmithingMenu instance, int i) {
+    private void onOnTake(SmithingMenu instance, int slot) {
         //Do nothing
     }
 }

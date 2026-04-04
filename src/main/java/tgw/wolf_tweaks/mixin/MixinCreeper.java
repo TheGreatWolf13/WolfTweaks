@@ -4,6 +4,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,7 +17,7 @@ public abstract class MixinCreeper extends Monster {
 
     @Unique private int numberOfDroppedSkulls;
 
-    public MixinCreeper(EntityType<? extends Monster> entityType, Level level) {
+    public MixinCreeper(EntityType<? extends @NotNull Monster> entityType, Level level) {
         super(entityType, level);
     }
 
@@ -35,7 +36,7 @@ public abstract class MixinCreeper extends Monster {
         return this.isPowered() && this.random.nextFloat() < chance;
     }
 
-    @Redirect(method = "method_72496", at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/world/entity/monster/Creeper;droppedSkulls:Z"))
+    @Redirect(method = "lambda$killedEntity$0", at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/world/entity/monster/Creeper;droppedSkulls:Z"))
     private void killedEntity_lambda_droppedSkulls_write(Creeper instance, boolean value) {
         ++this.numberOfDroppedSkulls;
     }

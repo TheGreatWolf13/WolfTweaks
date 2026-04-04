@@ -1,6 +1,6 @@
 package tgw.wolf_tweaks.mixin;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractMountInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.HorseInventoryScreen;
 import net.minecraft.network.chat.Component;
@@ -22,8 +22,8 @@ public abstract class MixinHorseInventoryScreen extends AbstractMountInventorySc
     }
 
     @Override
-    public void renderLabels(@NotNull GuiGraphics gui, int mouseX, int mouseY) {
-        super.renderLabels(gui, mouseX, mouseY);
+    public void extractBackground(@NotNull GuiGraphicsExtractor gui, int mouseX, int mouseY, float a) {
+        super.extractBackground(gui, mouseX, mouseY, a);
         boolean hasChest = this.mount instanceof AbstractChestedHorse h && h.hasChest();
         double jumpValue = Math.round(Converter.jumpStrengthToJumpHeight(this.mount.getJumpPower()) * 10) / 10.0;
         double healthValue = Math.round(this.mount.getMaxHealth() * 10) / 10.0;
@@ -50,20 +50,20 @@ public abstract class MixinHorseInventoryScreen extends AbstractMountInventorySc
             hearthColor = 0xffff_0000;
         }
         if (!hasChest) {
-            gui.drawString(this.font, "(4.7-14.2)", 119, 26, 0xff46_4646, false);
-            gui.drawString(this.font, "(1-5.3)", 119, 36, 0xff46_4646, false);
-            gui.drawString(this.font, "(15-30)", 119, 46, 0xff46_4646, false);
-            gui.drawString(this.font, "➟", 82, 26, speedColor, false);
-            gui.drawString(this.font, String.valueOf(speedValue), 93, 26, speedColor, false);
-            gui.drawString(this.font, "⇮", 84, 36, jumpColor, false);
-            gui.drawString(this.font, String.valueOf(jumpValue), 93, 36, jumpColor, false);
-            gui.drawString(this.font, "♥", 83, 46, hearthColor, false);
-            gui.drawString(this.font, String.valueOf(healthValue), 93, 46, hearthColor, false);
+            gui.text(this.font, "(4.7-14.2)", 119, 26, 0xff46_4646, false);
+            gui.text(this.font, "(1-5.3)", 119, 36, 0xff46_4646, false);
+            gui.text(this.font, "(15-30)", 119, 46, 0xff46_4646, false);
+            gui.text(this.font, "➟", 82, 26, speedColor, false);
+            gui.text(this.font, String.valueOf(speedValue), 93, 26, speedColor, false);
+            gui.text(this.font, "⇮", 84, 36, jumpColor, false);
+            gui.text(this.font, String.valueOf(jumpValue), 93, 36, jumpColor, false);
+            gui.text(this.font, "♥", 83, 46, hearthColor, false);
+            gui.text(this.font, String.valueOf(healthValue), 93, 46, hearthColor, false);
         }
         else {
-            gui.drawString(this.font, "➟ " + speedValue, 80, 6, speedColor, false);
-            gui.drawString(this.font, "⇮ " + jumpValue, 115, 6, jumpColor, false);
-            gui.drawString(this.font, "♥ " + healthValue, 140, 6, hearthColor, false);
+            gui.text(this.font, "➟ " + speedValue, 80, 6, speedColor, false);
+            gui.text(this.font, "⇮ " + jumpValue, 115, 6, jumpColor, false);
+            gui.text(this.font, "♥ " + healthValue, 140, 6, hearthColor, false);
         }
         if (this.mount instanceof Llama llama) {
             int strength = 3 * llama.getStrength();
@@ -75,8 +75,8 @@ public abstract class MixinHorseInventoryScreen extends AbstractMountInventorySc
                 strengthColor = 0xffff_0000;
             }
             if (!hasChest) {
-                gui.drawString(this.font, "▦", 83, 56, strengthColor, false);
-                gui.drawString(this.font, String.valueOf(strength), 93, 56, strengthColor, false);
+                gui.text(this.font, "▦", 83, 56, strengthColor, false);
+                gui.text(this.font, String.valueOf(strength), 93, 56, strengthColor, false);
             }
         }
     }

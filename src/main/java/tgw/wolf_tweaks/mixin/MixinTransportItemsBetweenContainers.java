@@ -13,6 +13,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,7 +30,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 @Mixin(TransportItemsBetweenContainers.class)
-public abstract class MixinTransportItemsBetweenContainers extends Behavior<PathfinderMob> {
+public abstract class MixinTransportItemsBetweenContainers extends Behavior<@NotNull PathfinderMob> {
 
     @Shadow @Final private static int TRANSPORTED_ITEM_MAX_STACK_SIZE;
 
@@ -62,34 +63,34 @@ public abstract class MixinTransportItemsBetweenContainers extends Behavior<Path
     }
 
     @Shadow
-    protected abstract void clearMemoriesAfterMatchingTargetFound(PathfinderMob pathfinderMob);
+    protected abstract void clearMemoriesAfterMatchingTargetFound(PathfinderMob body);
 
     @ModifyArg(method = "onReachedTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/behavior/TransportItemsBetweenContainers;doReachedTargetInteraction(Lnet/minecraft/world/entity/PathfinderMob;Lnet/minecraft/world/Container;Ljava/util/function/BiConsumer;Ljava/util/function/BiConsumer;Ljava/util/function/BiConsumer;Ljava/util/function/BiConsumer;)V"), index = 3)
-    private BiConsumer<PathfinderMob, Container> onReachedTarget_doReachedTargetInteraction_lambda3_failPickUp(BiConsumer<PathfinderMob, Container> biConsumer, @Local(argsOnly = true) TransportItemsBetweenContainers.TransportItemTarget target) {
-        return (mob, container) -> {
+    private BiConsumer<PathfinderMob, Container> onReachedTarget_doReachedTargetInteraction_lambda3_failPickUp(BiConsumer<PathfinderMob, Container> biConsumer, @Local(argsOnly = true, name = "target") TransportItemsBetweenContainers.TransportItemTarget target) {
+        return (mob, _) -> {
             this.stopTargetingCurrentTarget(mob);
             this.setVisitedBlockPos(mob, mob.level(), target.pos());
         };
     }
 
     @ModifyArg(method = "onReachedTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/behavior/TransportItemsBetweenContainers;doReachedTargetInteraction(Lnet/minecraft/world/entity/PathfinderMob;Lnet/minecraft/world/Container;Ljava/util/function/BiConsumer;Ljava/util/function/BiConsumer;Ljava/util/function/BiConsumer;Ljava/util/function/BiConsumer;)V"), index = 5)
-    private BiConsumer<PathfinderMob, Container> onReachedTarget_doReachedTargetInteraction_lambda5_failPutDown(BiConsumer<PathfinderMob, Container> biConsumer, @Local(argsOnly = true) TransportItemsBetweenContainers.TransportItemTarget target) {
-        return (mob, container) -> {
+    private BiConsumer<PathfinderMob, Container> onReachedTarget_doReachedTargetInteraction_lambda5_failPutDown(BiConsumer<PathfinderMob, Container> biConsumer, @Local(argsOnly = true, name = "target") TransportItemsBetweenContainers.TransportItemTarget target) {
+        return (mob, _) -> {
             this.stopTargetingCurrentTarget(mob);
             this.setVisitedBlockPos(mob, mob.level(), target.pos());
         };
     }
 
     @Inject(method = "pickUpItems", at = @At("HEAD"), cancellable = true)
-    private void pickUpItems_head(PathfinderMob mob, Container container, CallbackInfo ci) {
-        if (mob instanceof PatchCopperGolem golem) {
+    private void pickUpItems_head(PathfinderMob body, Container container, CallbackInfo ci) {
+        if (body instanceof PatchCopperGolem golem) {
             Item lastCarriedItem = golem.getLastCarriedItem();
             ItemStack carriedItem = smartPickupItemFromContainer(container, lastCarriedItem);
-            mob.setItemSlot(EquipmentSlot.MAINHAND, carriedItem);
-            mob.setGuaranteedDrop(EquipmentSlot.MAINHAND);
+            body.setItemSlot(EquipmentSlot.MAINHAND, carriedItem);
+            body.setGuaranteedDrop(EquipmentSlot.MAINHAND);
             container.setChanged();
             if (lastCarriedItem == Items.AIR || !carriedItem.is(lastCarriedItem)) {
-                this.clearMemoriesAfterMatchingTargetFound(mob);
+                this.clearMemoriesAfterMatchingTargetFound(body);
                 golem.setLastCarriedItem(carriedItem);
             }
             ci.cancel();
@@ -97,18 +98,18 @@ public abstract class MixinTransportItemsBetweenContainers extends Behavior<Path
     }
 
     @Redirect(method = "putDownItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/behavior/TransportItemsBetweenContainers;clearMemoriesAfterMatchingTargetFound(Lnet/minecraft/world/entity/PathfinderMob;)V"))
-    private void putDownItem_clearMemoriesAfterMatchingTargetFound(TransportItemsBetweenContainers instance, PathfinderMob pathfinderMob) {
+    private void putDownItem_clearMemoriesAfterMatchingTargetFound(TransportItemsBetweenContainers instance, PathfinderMob body) {
         //Do nothing
     }
 
     @Shadow
-    protected abstract void setVisitedBlockPos(PathfinderMob pathfinderMob, Level level, BlockPos blockPos);
+    protected abstract void setVisitedBlockPos(PathfinderMob body, Level level, BlockPos target);
 
     @Shadow
-    protected abstract void stopTargetingCurrentTarget(PathfinderMob pathfinderMob);
+    protected abstract void stopTargetingCurrentTarget(PathfinderMob body);
 
     @Redirect(method = "updateInvalidTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/behavior/TransportItemsBetweenContainers;setVisitedBlockPos(Lnet/minecraft/world/entity/PathfinderMob;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V"))
-    private void updateInvalidTarget_setVisitedBlockPos(TransportItemsBetweenContainers instance, PathfinderMob pathfinderMob, Level level, BlockPos blockPos) {
+    private void updateInvalidTarget_setVisitedBlockPos(TransportItemsBetweenContainers instance, PathfinderMob body, Level level, BlockPos target) {
         //Do nothing
     }
 }

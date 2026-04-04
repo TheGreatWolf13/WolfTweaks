@@ -10,13 +10,12 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -139,7 +138,7 @@ public final class WolfTweaksClient implements ClientModInitializer {
         PACKETS_BY_TYPE.mergeInt(packet.type(), 1, Integer::sum);
     }
 
-    private static void renderTexture(GuiGraphics gui, int screenWidth, int screenHeight) {
+    private static void renderTexture(GuiGraphicsExtractor gui, int screenWidth, int screenHeight) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) {
             return;
@@ -150,7 +149,7 @@ public final class WolfTweaksClient implements ClientModInitializer {
         Matrix3x2fStack matrixStack = gui.pose();
         matrixStack.pushMatrix();
         matrixStack.translate(0, -15);
-        gui.drawCenteredString(mc.font, Component.translatable("wolf_tweaks.gui.random_block_placement"), x, y, 0xFFFF_FFFF);
+        gui.centeredText(mc.font, Component.translatable("wolf_tweaks.gui.random_block_placement"), x, y, 0xFFFF_FFFF);
         matrixStack.popMatrix();
     }
 
@@ -169,13 +168,13 @@ public final class WolfTweaksClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        buildingReplace = KeyBindingHelper.registerKeyBinding(new KeyMapping("wolf_tweaks.key.replace", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, KeyMapping.Category.CREATIVE));
-        randomPlaceKey = KeyBindingHelper.registerKeyBinding(new KeyMapping("wolf_tweaks.key.random_block_placement_toggle", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, KeyMapping.Category.GAMEPLAY));
+        buildingReplace = new KeyMapping("wolf_tweaks.key.replace", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, KeyMapping.Category.CREATIVE);
+        randomPlaceKey = new KeyMapping("wolf_tweaks.key.random_block_placement_toggle", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, KeyMapping.Category.GAMEPLAY);
         ClientSendMessageEvents.COMMAND.register(cmd -> {
             if ("packetinfo".equals(cmd)) {
                 if (PACKETS_BY_TYPE.isEmpty()) {
                     //noinspection DataFlowIssue
-                    Minecraft.getInstance().player.displayClientMessage(Component.literal("Total: 0"), false);
+                    Minecraft.getInstance().player.sendSystemMessage(Component.literal("Total: 0"));
                     return;
                 }
                 int total = 0;
@@ -187,8 +186,8 @@ public final class WolfTweaksClient implements ClientModInitializer {
                 }
                 ordered.sort((a, b) -> Integer.compare(b.rightInt(), a.rightInt()));
                 //noinspection DataFlowIssue
-                Minecraft.getInstance().player.displayClientMessage(Component.literal("Total: " + total), false);
-                Minecraft.getInstance().player.displayClientMessage(Component.literal(ordered.stream().map(pair -> pair.rightInt() + ": " + pair.left()).collect(Collectors.joining("\n"))), false);
+                Minecraft.getInstance().player.sendSystemMessage(Component.literal("Total: " + total));
+                Minecraft.getInstance().player.sendSystemMessage(Component.literal(ordered.stream().map(pair -> pair.rightInt() + ": " + pair.left()).collect(Collectors.joining("\n"))));
                 return;
             }
             if ("exportmap".equals(cmd)) {
@@ -217,7 +216,7 @@ public final class WolfTweaksClient implements ClientModInitializer {
                             file.createNewFile();
                         }
                         catch (IOException e) {
-                            mc.player.displayClientMessage(Component.literal("Could not create new file to export map. See log for details."), false);
+                            mc.player.sendSystemMessage(Component.literal("Could not create new file to export map. See log for details."));
                             WolfTweaks.LOGGER.error("Could not save exported map: ", e);
                             return;
                         }
@@ -233,7 +232,7 @@ public final class WolfTweaksClient implements ClientModInitializer {
                         ImageIO.write(image, "png", file);
                     }
                     catch (IOException e) {
-                        mc.player.displayClientMessage(Component.literal("Could not save exported map. See log for details."), false);
+                        mc.player.sendSystemMessage(Component.literal("Could not save exported map. See log for details."));
                         WolfTweaks.LOGGER.error("Could not save exported map: ", e);
                     }
                 }
@@ -290,19 +289,19 @@ public final class WolfTweaksClient implements ClientModInitializer {
                                 //noinspection ObjectAllocationInLoop
                                 String properties = state.getProperties().stream().map(p -> p.value(finalState).toString()).collect(Collectors.joining(","));
                                 //noinspection ObjectAllocationInLoop
-                                player.connection.sendCommand("setblock " + pos.getX() + " " + pos.getY() + " " + pos.getZ() + " " + state.getBlockHolder().getRegisteredName() + "[" + properties + "]");
+                                player.connection.sendCommand("setblock " + pos.getX() + " " + pos.getY() + " " + pos.getZ() + " " + state.typeHolder().getRegisteredName() + "[" + properties + "]");
                             }
                         }
                     }
                 }
             }
         });
-        HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
+        HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(WolfTweaks.MOD_ID, "random_placement_mode"), (gui, _) -> {
             if (randomPlacementMode) {
                 Window window = Minecraft.getInstance().getWindow();
                 int screenWidth = window.getGuiScaledWidth();
                 int screenHeight = window.getGuiScaledHeight();
-                renderTexture(drawContext, screenWidth, screenHeight);
+                renderTexture(gui, screenWidth, screenHeight);
             }
         });
     }

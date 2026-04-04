@@ -16,9 +16,9 @@ import tgw.wolf_tweaks.WolfTweaks;
 public abstract class MixinItemStack implements DataComponentHolder, FabricItemStack {
 
     @Redirect(method = "applyDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/advancements/criterion/ItemDurabilityTrigger;trigger(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/item/ItemStack;I)V"))
-    private void applyDamage_trigger(ItemDurabilityTrigger trigger, ServerPlayer player, ItemStack stack, int damage) {
-        trigger.trigger(player, stack, damage);
-        if (damage >= 0.9 * this.getMaxDamage()) {
+    private void applyDamage_trigger(ItemDurabilityTrigger trigger, ServerPlayer player, ItemStack itemStack, int newDurability) {
+        trigger.trigger(player, itemStack, newDurability);
+        if (newDurability >= 0.9 * this.getMaxDamage()) {
             WolfTweaks.nofityDurability((ItemStack) (Object) this, player);
         }
     }

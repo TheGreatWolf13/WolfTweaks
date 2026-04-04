@@ -35,7 +35,7 @@ public class ChunkLoaderManager {
         int z = ChunkPos.getZ(chunkPos);
         for (int dz = 0; dz < 3; ++dz) {
             for (int dx = 0; dx < 3; ++dx) {
-                toAdd.add(ChunkPos.asLong(x + dx - 1, z + dz - 1));
+                toAdd.add(ChunkPos.pack(x + dx - 1, z + dz - 1));
             }
         }
     }
@@ -82,10 +82,10 @@ public class ChunkLoaderManager {
             levelChunks = new L2OHashMap<>();
             this.forceLoadedChunks.put(worldRegistryKey, levelChunks);
             list = new OArrayList<>();
-            levelChunks.put(chunkPos.toLong(), list);
+            levelChunks.put(chunkPos.pack(), list);
         }
         else {
-            long pos = chunkPos.toLong();
+            long pos = chunkPos.pack();
             list = levelChunks.get(pos);
             if (list == null) {
                 list = new OArrayList<>();
@@ -114,7 +114,7 @@ public class ChunkLoaderManager {
     }
 
     private void setupTimer() {
-        ServerTickEvents.END_WORLD_TICK.register(level -> {
+        ServerTickEvents.END_LEVEL_TICK.register(level -> {
             long time = level.getGameTime();
             if (time != this.lastTick && time % 20 == 0) {
                 this.lastTick = time;

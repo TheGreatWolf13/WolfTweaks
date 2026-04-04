@@ -188,13 +188,13 @@ public class WolfTweaks implements ModInitializer {
     }
 
     public static void nofityDurability(ItemStack stack, Player player) {
-        player.displayClientMessage(Component.translatable("wolf_tweaks.notify_durability", stack.getDisplayName(), Component.literal("10%").withStyle(ChatFormatting.RED)).withStyle(ChatFormatting.YELLOW), true);
+        player.sendOverlayMessage(Component.translatable("wolf_tweaks.notify_durability", stack.getDisplayName(), Component.literal("10%").withStyle(ChatFormatting.RED)).withStyle(ChatFormatting.YELLOW));
         Level level = player.level();
         level.playSound(level.isClientSide() ? player : null, player.getX(), player.getY(), player.getZ(), SoundEvents.NOTE_BLOCK_PLING, SoundSource.MASTER, 0.6f, 1.0f);
     }
 
     private static void registerServerEvents() {
-        ServerTickEvents.END_WORLD_TICK.register(level -> {
+        ServerTickEvents.END_LEVEL_TICK.register(level -> {
             long time = level.getGameTime();
             if ((time & 511) == 0) {
                 long lastTime = SCAFFOLDING_TIME.getLong(level);
@@ -208,12 +208,12 @@ public class WolfTweaks implements ModInitializer {
                 }
             }
         });
-        ServerTickEvents.END_WORLD_TICK.register(level -> {
+        ServerTickEvents.END_LEVEL_TICK.register(level -> {
             List<ServerPlayer> players = level.players();
             if (players.isEmpty()) {
                 return;
             }
-            RandomSource random = level.random;
+            RandomSource random = level.getRandom();
             for (int i = DECAY_RATE; i > 0; --i) {
                 ServerPlayer player = players.size() == 1 ? players.getFirst() : players.get(random.nextInt(players.size()));
                 int offX = random.nextIntBetweenInclusive(-DECAY_RADIUS, DECAY_RADIUS);
@@ -265,7 +265,7 @@ public class WolfTweaks implements ModInitializer {
     }
 
     private static void tryToDecay(ServerLevel level, BlockState state, BlockPos pos) {
-        RandomSource random = level.random;
+        RandomSource random = level.getRandom();
         Block block = state.getBlock();
         if (block == Blocks.CAMPFIRE || block == Blocks.SOUL_CAMPFIRE) {
             if (random.nextFloat() < 0.2f) {

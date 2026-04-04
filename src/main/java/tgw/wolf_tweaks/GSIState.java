@@ -13,6 +13,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class GSIState {
                 List<AuroraKeyBinding> tempList = new ArrayList<>();
                 for (KeyMapping key : keys) {
                     if (!key.getName().contains("unknown") && key.getName().contains("keyboard")) {
-                        String context = "key.categories.inventory".equals(key.getCategory()) ? "GUI" : "UNIVERSAL";
+                        String context = "key.categories.inventory".equals(key.getCategory().id().toString()) ? "GUI" : "UNIVERSAL";
                         //noinspection ObjectAllocationInLoop
                         tempList.add(new AuroraKeyBinding(AuroraKeyBinding.ToAuroraKeyCode(key.getName()), null, context));
                     }
@@ -73,7 +74,7 @@ public class GSIState {
     @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static class PlayerNode {
         private static final String[] EFFECT_NAMES = new String[28];
-        private static final Holder<MobEffect>[] EFFECTS = new Holder[28];
+        private static final Holder<@NotNull MobEffect>[] EFFECTS = new Holder[28];
 
         static {
             EFFECT_NAMES[0] = "moveSpeed";
@@ -197,11 +198,11 @@ public class GSIState {
                 return;
 
             }
-            this.worldTime = level.getDayTime();
+            this.worldTime = level.getOverworldClockTime();
             this.isDayTime = level.isBrightOutside();
             this.rainStrength = level.getRainLevel(1);
             this.isRaining = level.isRaining();
-            ResourceKey<Level> dimension = level.dimension();
+            ResourceKey<@NotNull Level> dimension = level.dimension();
             if (dimension == Level.NETHER) {
                 this.dimensionID = -1;
             }

@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.TntBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,37 +35,37 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinItem implements FeatureElement, ItemLike, FabricItem {
 
     @Inject(method = "useOn", at = @At("HEAD"), cancellable = true)
-    public void inject_useOn(UseOnContext useOnContext, CallbackInfoReturnable<InteractionResult> cir) {
-        ItemStack stack = useOnContext.getItemInHand();
+    public void inject_useOn(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
+        ItemStack stack = context.getItemInHand();
         if (stack.is(ItemTags.SWORDS)) {
             ItemEnchantments enchantments = stack.getEnchantments();
-            Level level = useOnContext.getLevel();
-            Registry<Enchantment> registry = level.registryAccess().lookup(Registries.ENCHANTMENT).orElse(null);
+            Level level = context.getLevel();
+            Registry<@NotNull Enchantment> registry = level.registryAccess().lookup(Registries.ENCHANTMENT).orElse(null);
             if (registry != null) {
-                Holder.Reference<Enchantment> enchantment = registry.get(Enchantments.FIRE_ASPECT).orElse(null);
+                Holder.Reference<@NotNull Enchantment> enchantment = registry.get(Enchantments.FIRE_ASPECT).orElse(null);
                 if (enchantment != null && enchantments.getLevel(enchantment) > 0) {
-                    BlockPos pos = useOnContext.getClickedPos();
+                    BlockPos pos = context.getClickedPos();
                     BlockState state = level.getBlockState(pos);
                     if (state.is(BlockTags.CAMPFIRES) || state.is(BlockTags.CANDLES) || state.is(BlockTags.CANDLE_CAKES)) {
                         if (state.hasProperty(BlockStateProperties.LIT) && !state.getValue(BlockStateProperties.LIT)) {
                             level.setBlockAndUpdate(pos, state.setValue(BlockStateProperties.LIT, true));
-                            Player player = useOnContext.getPlayer();
+                            Player player = context.getPlayer();
                             if (player != null) {
                                 player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
-                                stack.hurtAndBreak(1, player, useOnContext.getHand());
+                                stack.hurtAndBreak(1, player, context.getHand());
                             }
                             level.playLocalSound(pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0f, 1.0f, false);
                             cir.setReturnValue(InteractionResult.SUCCESS);
                         }
                     }
                     else if (state.is(Blocks.TNT)) {
-                        Player player = useOnContext.getPlayer();
+                        Player player = context.getPlayer();
                         if (TntBlock.prime(level, pos, player)) {
                             level.removeBlock(pos, false);
                         }
                         if (player != null) {
                             player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
-                            stack.hurtAndBreak(1, player, useOnContext.getHand());
+                            stack.hurtAndBreak(1, player, context.getHand());
                         }
                         level.playLocalSound(pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0f, 1.0f, false);
                         cir.setReturnValue(InteractionResult.SUCCESS);

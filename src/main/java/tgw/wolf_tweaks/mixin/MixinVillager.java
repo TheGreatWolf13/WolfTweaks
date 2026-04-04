@@ -27,7 +27,7 @@ public abstract class MixinVillager extends AbstractVillager implements Reputati
     }
 
     @Inject(method = "die", at = @At("HEAD"))
-    private void die_head(DamageSource damageSource, CallbackInfo ci) {
+    private void die_head(DamageSource source, CallbackInfo ci) {
         Level level = this.level();
         if (!level.isClientSide()) {
             //noinspection DataFlowIssue
@@ -48,7 +48,7 @@ public abstract class MixinVillager extends AbstractVillager implements Reputati
                     dim = "Unknown";
                 }
                 BlockPos pos = this.blockPosition();
-                Component deathMessage = damageSource.getLocalizedDeathMessage(this).copy().append(" [" + dim + " @ " + pos.getX() + " " + pos.getY() + " " + pos.getZ() + "]");
+                Component deathMessage = source.getLocalizedDeathMessage(this).copy().append(" [" + dim + " @ " + pos.getX() + " " + pos.getY() + " " + pos.getZ() + "]");
                 for (int i = 0, len = players.size(); i < len; ++i) {
                     ServerPlayer player = players.get(i);
                     player.sendSystemMessage(deathMessage);

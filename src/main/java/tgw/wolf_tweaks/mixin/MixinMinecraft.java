@@ -11,6 +11,7 @@ import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -20,28 +21,28 @@ import tgw.wolf_tweaks.WolfTweaks;
 import tgw.wolf_tweaks.WolfTweaksClient;
 
 @Mixin(Minecraft.class)
-public abstract class MixinMinecraft extends ReentrantBlockableEventLoop<Runnable> implements WindowEventHandler {
+public abstract class MixinMinecraft extends ReentrantBlockableEventLoop<@NotNull Runnable> implements WindowEventHandler {
 
     @Shadow public @Nullable LocalPlayer player;
 
     public MixinMinecraft(String string) {
-        super(string);
+        super(string, true);
     }
 
     @Redirect(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isItemEnabled(Lnet/minecraft/world/flag/FeatureFlagSet;)Z"))
-    private boolean startAttack_isItemEnabled(ItemStack stack, FeatureFlagSet flags) {
+    private boolean startAttack_isItemEnabled(ItemStack stack, FeatureFlagSet enabledFeatures) {
         if (this.player != null && stack.isDamageableItem() && stack.getDamageValue() >= 0.9 * stack.getMaxDamage()) {
             WolfTweaks.nofityDurability(stack, this.player);
         }
-        return stack.isItemEnabled(flags);
+        return stack.isItemEnabled(enabledFeatures);
     }
 
     @Redirect(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isItemEnabled(Lnet/minecraft/world/flag/FeatureFlagSet;)Z"))
-    private boolean startUseItem_isItemEnabled(ItemStack stack, FeatureFlagSet flags) {
+    private boolean startUseItem_isItemEnabled(ItemStack stack, FeatureFlagSet enabledFeatures) {
         if (this.player != null && stack.isDamageableItem() && stack.getDamageValue() >= 0.9 * stack.getMaxDamage()) {
             WolfTweaks.nofityDurability(stack, this.player);
         }
-        return stack.isItemEnabled(flags);
+        return stack.isItemEnabled(enabledFeatures);
     }
 
     @SuppressWarnings("MethodMayBeStatic")

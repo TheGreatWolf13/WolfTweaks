@@ -22,14 +22,14 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
 
     @SuppressWarnings("MethodMayBeStatic")
     @Redirect(method = "createResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;set(Lnet/minecraft/core/component/DataComponentType;Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 1))
-    private <T> T onCreateResult0(ItemStack instance, DataComponentType<? super T> dataComponentType, T object) {
+    private <T> T onCreateResult0(ItemStack instance, DataComponentType<? super T> type, T value) {
         //Do nothing
-        return object;
+        return value;
     }
 
     @SuppressWarnings("MethodMayBeStatic")
     @Inject(method = "createResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getCount()I", ordinal = 1))
-    private void onCreateResult1(CallbackInfo ci, @Local(ordinal = 0) LocalIntRef i, @Local(ordinal = 2) int g, @Local(ordinal = 4) int s) {
-        i.set(i.get() - s * g);
+    private void onCreateResult1(CallbackInfo ci, @Local(name = "price") LocalIntRef price, @Local(name = "current") int current, @Local(name = "fee") int fee) {
+        price.set(price.get() - fee * current);
     }
 }

@@ -1,4 +1,4 @@
-accessWidener v2 named
+accessWidener v2 official
 
 accessible method net/minecraft/world/entity/LivingEntity getJumpPower ()F
 accessible method net/minecraft/world/level/block/entity/vault/VaultServerData <init> (Ljava/util/Set;JLjava/util/List;I)V

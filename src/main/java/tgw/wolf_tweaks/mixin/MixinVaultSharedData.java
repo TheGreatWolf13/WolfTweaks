@@ -16,7 +16,7 @@ public abstract class MixinVaultSharedData {
 
     @SuppressWarnings("MethodMayBeStatic")
     @Inject(method = "updateConnectedPlayersWithinRange", at = @At("HEAD"))
-    private void updateConnectedPlayersWithinRange_head(ServerLevel level, BlockPos pos, VaultServerData data, VaultConfig config, double distance, CallbackInfo ci) {
-        ((PatchVaultServerData) data).updateRewardedPlayers(level);
+    private void updateConnectedPlayersWithinRange_head(ServerLevel serverLevel, BlockPos pos, VaultServerData serverData, VaultConfig config, double limit, CallbackInfo ci) {
+        ((PatchVaultServerData) serverData).updateRewardedPlayers(serverLevel);
     }
 }

@@ -62,7 +62,7 @@ public abstract class MixinScaffoldingBlock extends Block implements SimpleWater
 
     @SuppressWarnings("MethodMayBeStatic")
     @Inject(method = "tick", at = @At("TAIL"))
-    private void tick_tail(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, CallbackInfo ci, @Local(ordinal = 1) BlockState newState) {
+    private void tick_tail(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, CallbackInfo ci, @Local(name = "newState") BlockState newState) {
         if (state == newState && state.getValue(DISTANCE) != 7) {
             WolfTweaks.removeDependencies(level, pos);
         }
@@ -70,7 +70,7 @@ public abstract class MixinScaffoldingBlock extends Block implements SimpleWater
 
     @SuppressWarnings("MethodMayBeStatic")
     @Inject(method = "updateShape", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ScheduledTickAccess;scheduleTick(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;I)V"))
-    private void updateShape_scheduleTick(BlockState state, LevelReader level, ScheduledTickAccess scheduler, BlockPos pos, Direction fromDir, BlockPos fromPos, BlockState fromState, RandomSource random, CallbackInfoReturnable<BlockState> cir) {
-        WolfTweaks.addScaffoldingDependency((Level) level, pos.asLong(), fromPos.asLong());
+    private void updateShape_scheduleTick(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random, CallbackInfoReturnable<BlockState> cir) {
+        WolfTweaks.addScaffoldingDependency((Level) level, pos.asLong(), neighbourPos.asLong());
     }
 }
