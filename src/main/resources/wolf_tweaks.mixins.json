@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "MixinAbstractMinecart",
+    "MixinAnvilBlock",
     "MixinAnvilMenu",
     "MixinAxeItem",
     "MixinBlock",
@@ -27,6 +28,8 @@
     "MixinScaffoldingBlock",
     "MixinShovelItem",
     "MixinSmithingMenu",
+    "MixinSweetBerryBushBlock",
+    "MixinTemptGoal",
     "MixinThrownTrident",
     "MixinTransportItemsBetweenContainers",
     "MixinVaultServerData",

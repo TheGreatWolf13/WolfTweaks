@@ -100,6 +100,12 @@ import java.util.List;
  * 1.22.0<br>
  * - Improved copper golems with better memory
  * <br>
+ * 1.23.0<br>
+ * - Tempt goal no longer has a cooldown
+ * - Berry bushes no longer affect creative players, crouching entities or entities wearing leggings
+ * - Anvils can be repaired with iron ingots
+ * - Hoes can now replant crops
+ * - Compass now shows coordinates when on the inventory
  **/
 public class WolfTweaks implements ModInitializer {
 

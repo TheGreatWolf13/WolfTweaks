@@ -20,6 +20,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -30,6 +31,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -43,6 +45,7 @@ import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 import tgw.wolf_tweaks.util.collection.lists.OArrayList;
@@ -61,6 +64,7 @@ public final class WolfTweaksClient implements ClientModInitializer {
     private static final Component INSTANT_MINE = Component.translatable("wolf_tweaks.mining_time.instant_mine").withStyle(ChatFormatting.BLUE);
     private static final Reference2IntMap<PacketType<?>> PACKETS_BY_TYPE = new Reference2IntOpenHashMap<>();
     private static final Gson GSON = new Gson();
+    private static final String[] DIRECTIONS = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
     private static final GSIState GSI_STATE = new GSIState();
     private static final Identifier RANDOM_PLACEMENT_TEXTURE = Identifier.fromNamespaceAndPath("wolf_tweaks", "textures/gui/random_block_placement.png");
     private static KeyMapping buildingReplace;
@@ -296,12 +300,43 @@ public final class WolfTweaksClient implements ClientModInitializer {
                 }
             }
         });
-        HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(WolfTweaks.MOD_ID, "random_placement_mode"), (gui, _) -> {
+        HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(WolfTweaks.MOD_ID, "random_placement_mode"), (graphics, _) -> {
             if (randomPlacementMode) {
                 Window window = Minecraft.getInstance().getWindow();
                 int screenWidth = window.getGuiScaledWidth();
                 int screenHeight = window.getGuiScaledHeight();
-                renderTexture(gui, screenWidth, screenHeight);
+                renderTexture(graphics, screenWidth, screenHeight);
+            }
+        });
+        HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(WolfTweaks.MOD_ID, "compass"), (graphics, _) -> {
+            Minecraft mc = Minecraft.getInstance();
+            LocalPlayer player = mc.player;
+            if (player == null) {
+                return;
+            }
+            if (mc.screen != null || mc.gui.getDebugOverlay().showDebugScreen()) {
+                return;
+            }
+            NonNullList<@NotNull ItemStack> items = player.inventoryMenu.getItems();
+            boolean found = false;
+            for (int i = 0, len = items.size(); i < len; i++) {
+                ItemStack stack = items.get(i);
+                if (stack.is(Items.COMPASS)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                //Starts at south, goes to west
+                float yaw = player.getYRot() + 180.0f - 45.0f / 2.0f;
+                yaw = Mth.wrapDegrees(yaw);
+                if (yaw < 0) {
+                    yaw += 360.0f;
+                }
+                int directionIndex = ((int) (yaw / 45.0f) + 1) % 8;
+                BlockPos pos = player.blockPosition();
+                String display = "[" + DIRECTIONS[directionIndex] + "] X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ();
+                graphics.text(mc.font, display, 5, 5, 0xFFFF_FFFF, true);
             }
         });
     }
