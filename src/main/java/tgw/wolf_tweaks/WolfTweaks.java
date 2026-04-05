@@ -106,6 +106,9 @@ import java.util.List;
  * - Anvils can be repaired with iron ingots
  * - Hoes can now replant crops
  * - Compass now shows coordinates when on the inventory
+ * <br>
+ * 1.24.0<br>
+ * - Villager trades are no longer randomized every time a workstation is placed
  **/
 public class WolfTweaks implements ModInitializer {
 
