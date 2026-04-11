@@ -109,6 +109,9 @@ import java.util.List;
  * <br>
  * 1.24.0<br>
  * - Villager trades are no longer randomized every time a workstation is placed
+ * <br>
+ * 1.25.0<br>
+ * - Music now stops playing when the game is paused and the window loses focus
  **/
 public class WolfTweaks implements ModInitializer {
 
