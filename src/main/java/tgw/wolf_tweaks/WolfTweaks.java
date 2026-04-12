@@ -112,6 +112,9 @@ import java.util.List;
  * <br>
  * 1.25.0<br>
  * - Music now stops playing when the game is paused and the window loses focus
+ * <br>
+ * 1.26.0<br>
+ * - Dark Oak and Pale Oak leaves drop double the amount of saplings
  **/
 public class WolfTweaks implements ModInitializer {
 
